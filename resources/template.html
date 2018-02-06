@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <style>
+        body {
+            font-size: 40px;
+            color: white;
+            text-shadow: 0 0 2px #888;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="width:800px; margin:0 auto;" id="place">
+        <h1>
+            <div style="font-family:'Montserrat', sans-serif;" id="changeQuote"></div>
+        </h1>
+        <h3>
+            <div style="font-family:'Montserrat', sans-serif;" id="changeAuthor"></div>
+        </h3>
+    </div>
+    <script>
+        var quote = [{ "speaker": "Realman Notfakeson", "speech": "IlRoaXMgaXMgYSByZWFsbHkgcmVhbCBxdW90ZSI=" }];
+        var elemQ = document.getElementById("changeQuote");
+        var elemS = document.getElementById("changeAuthor");
+        var ememP = document.getElementById("place");
+
+        decodeBase64 = function (s) {
+            var e = {}, i, b = 0, c, x, l = 0, a, r = '', w = String.fromCharCode, L = s.length;
+            var A = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+            for (i = 0; i < 64; i++) { e[A.charAt(i)] = i; }
+            for (x = 0; x < L; x++) {
+                c = e[s.charAt(x)]; b = (b << 6) + c; l += 6;
+                while (l >= 8) { ((a = (b >>> (l -= 8)) & 0xff) || (x < (L - 2))) && (r += w(a)); }
+            }
+            return r;
+        };
+
+        display();
+        function display() {
+            var body = document.getElementsByTagName('body')[0];
+            var image = new Image();
+            image.src = 'https://source.unsplash.com/random';
+            image.onload = function () {
+                body.style.backgroundImage = 'url(' + image.src + ')';
+            };
+            elemQ.innerHTML = decodeBase64(quote[0].speech);
+            elemS.innerHTML = "-" + quote[0].speaker;
+        }
+    </script>
+</body>
+
+</html>
