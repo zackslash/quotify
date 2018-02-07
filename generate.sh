@@ -2,6 +2,9 @@
 # File: generate.sh
 # Description: create packages for lambda deployment
 
+echo -e "\033[4mEnsuring go-bindata...\033[0m"
+(cd vendor/github.com/zackslash/go-bindata && go install .)
+
 echo -e "\033[4mCollecting resources...\033[0m"
 go-bindata -pkg quotify -o resources.go resources/
 
