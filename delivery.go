@@ -26,6 +26,15 @@ func DeliverInspiration(slackWebhook, generateEndpoint, slackChannel, inEntropy 
 
 	now, next := getURLS(entropy, generateEndpoint)
 
+	// Make sure current image is in cache
+	http.Get(now)
+	fmt.Println(time.Now().UTC(), "pre-loaded current inspiration")
+
+	// Preload the 'next' image so that it is cached in URL grab or refreshes
+	// old cache using the same entropy;
+	http.Get(next)
+	fmt.Println(time.Now().UTC(), "pre-loaded next inspiration")
+
 	// Post the 'now' image to channel
 	payload := slack.Payload{
 		Username:  displayName,
@@ -37,18 +46,8 @@ func DeliverInspiration(slackWebhook, generateEndpoint, slackChannel, inEntropy 
 			},
 		},
 	}
-
 	slack.Send(slackWebhook, "", payload)
 	fmt.Println(time.Now().UTC(), "posted team inspiration")
-
-	// Preload the 'next' image so that it is cached in URL grab or refreshes
-	// old cache using the same entropy; request may exceed timeout but reponse
-	// is not important as this request is for benefit of the URLGRAB server.
-	client := http.Client{
-		Timeout: time.Duration(2 * time.Second),
-	}
-	client.Get(next)
-	fmt.Println(time.Now().UTC(), "pre-loaded next inspiration")
 }
 
 // Deterministically retrieve current and next image url using entropy provided

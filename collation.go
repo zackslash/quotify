@@ -181,5 +181,5 @@ func getTemplate(arr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return strings.Replace(string(s), "[{ \"speaker\": \"Realman Notfakeson\", \"speech\": \"IlRoaXMgaXMgYSByZWFsbHkgcmVhbCBxdW90ZSI=\" }]", arr, 1), nil
+	return strings.Replace(string(s), "[{\"speaker\": \"Realman Notfakeson\", \"speech\": \"IlRoaXMgaXMgYSByZWFsbHkgcmVhbCBxdW90ZSI=\"}]", arr, 1), nil
 }
