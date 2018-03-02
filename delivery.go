@@ -1,7 +1,6 @@
 package quotify
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -17,14 +16,8 @@ const (
 // DeliverInspiration adds new inspiration to team slack channel
 // it also preloads the next image in the chain ready for
 // consecutive execution of this process
-func DeliverInspiration(slackWebhook, generateEndpoint, slackChannel, inEntropy string) {
-	var entropy []string
-	err := json.Unmarshal([]byte(inEntropy), &entropy)
-	if err != nil {
-		fmt.Println(time.Now().UTC(), "failed to parse entropy")
-	}
-
-	now, next := getURLS(entropy, generateEndpoint)
+func DeliverInspiration(slackWebhook, generateEndpoint, slackChannel string) {
+	now, next := getURLS(generateEndpoint)
 
 	// Make sure current image is in cache
 	http.Get(now)
@@ -51,41 +44,28 @@ func DeliverInspiration(slackWebhook, generateEndpoint, slackChannel, inEntropy 
 }
 
 // Deterministically retrieve current and next image url using entropy provided
-func getURLS(entropy []string, generateEndpoint string) (current, next string) {
+func getURLS(generateEndpoint string) (current, next string) {
 	// random seed used for image on each day
-	td := time.Now().UTC().Day()
 	current = generateEndpoint
 	next = generateEndpoint
-	ci := 0
+	now := time.Now()
+	morrow := now.AddDate(0, 0, 1)
+	entToday := fmt.Sprintf("%d%d%d", now.Year(), now.Month(), now.Day())
+	entTomorrow := fmt.Sprintf("%d%d%d", morrow.Year(), morrow.Month(), morrow.Day())
+	currentSuff, nextSuff := getSuffixForPeriods()
 
-	for i := 0; i <= td; i++ {
-		lastIndex := len(entropy) - 1
-		ci++
-		if ci > lastIndex {
-			ci = 0
-		}
+	// Current url with current rotation code
+	current = current + entToday + currentSuff
 
-		if i == td {
-			currentSuff, nextSuff := getSuffixForPeriods()
-
-			// Current url with current rotation code
-			current = current + entropy[ci] + currentSuff
-
-			if nextSuff != "" {
-				// Next url with current rotation code + suffix
-				// (image was generated for the same day as the prior image)
-				next = current + entropy[ci] + nextSuff
-			} else {
-				// Next url with tomorrow's rotation code
-				if ci+1 > lastIndex {
-					ci = 0
-				} else {
-					ci++
-				}
-				next = next + entropy[ci]
-			}
-		}
+	if nextSuff != "" {
+		// Next url with current rotation code + suffix
+		// (image was generated for the same day as the prior image)
+		next = current + entToday + nextSuff
+	} else {
+		// Next url with tomorrow's rotation code
+		next = next + entTomorrow
 	}
+
 	return
 }
 

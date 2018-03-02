@@ -17,4 +17,3 @@ Set environment vars for each lamdba function
 - SLACK_CHANNEL (The name of the person or channel to recieve the rendered quotes)
 - SLACK_WEBHOOK_URL (your slack webhook URL)
 - IMAGE_GEN_ENDPOINT (endpoint of your url image renderer: Note this project uses the Lucid Cube URL Grab service)
-- ENT_DATA (JSON encoded string array used)

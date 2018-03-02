@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"net/http"
-	"reflect"
 	"strings"
 	"time"
 )
@@ -22,6 +21,7 @@ const (
 
 var errDisplay = errors.New("failed :/ sorry, not sorry")
 
+// GenerateSlackQuoteDisplay generates display
 func GenerateSlackQuoteDisplay(channelID, slackToken string) (string, error) {
 	// Retrieve author names
 	n, err := GetSlackNames(slackToken)
@@ -61,14 +61,16 @@ func GenerateSlackQuoteDisplay(channelID, slackToken string) (string, error) {
 }
 
 // Shuffle a slice
-func Shuffle(slice interface{}) {
-	rv := reflect.ValueOf(slice)
-	swap := reflect.Swapper(slice)
-	length := rv.Len()
-	for i := length - 1; i > 0; i-- {
-		j := rand.Intn(i + 1)
-		swap(i, j)
+func Shuffle(vals []Quote) []Quote {
+	r := rand.New(rand.NewSource(time.Now().Unix()))
+	ret := make([]Quote, len(vals))
+	n := len(vals)
+	for i := 0; i < n; i++ {
+		randIndex := r.Intn(len(vals))
+		ret[i] = vals[randIndex]
+		vals = append(vals[:randIndex], vals[randIndex+1:]...)
 	}
+	return ret
 }
 
 // GetSlackQuotes ; pass in a list of possible authors with the 'quote' channel ID and this will return complete quotes

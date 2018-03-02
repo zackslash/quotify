@@ -17,14 +17,11 @@ var (
 
 	// Render endpoint (Using Fortifi URLGrab)
 	imageGenEndpoint = os.Getenv("IMAGE_GEN_ENDPOINT")
-
-	// Generation entropy (seed data used to reuse the same URLGrab cache)
-	enptopyJSON = os.Getenv("ENT_DATA")
 )
 
 // Handler handles lambda request
 func Handler() {
-	quotify.DeliverInspiration(slackWebhook, imageGenEndpoint, channel, enptopyJSON)
+	quotify.DeliverInspiration(slackWebhook, imageGenEndpoint, channel)
 }
 
 func main() {

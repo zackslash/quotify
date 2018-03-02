@@ -65,12 +65,16 @@
   {
     var body = document.getElementsByTagName('body')[0];
     var image = new Image();
-    image.src = 'https://source.unsplash.com/random';
+    var qu = decodeBase64(quote[0].speech);
+    var searchStr = qu;
+    searchStr = searchStr.replace(/[^\w\s]|_/g, "").replace(/\s+/g, ",");
+    
+    image.src = 'https://source.unsplash.com/1280x960/?' + searchStr;
     image.onload = function ()
     {
       body.style.backgroundImage = 'url(' + image.src + ')';
     };
-    elemQ.innerHTML = decodeBase64(quote[0].speech);
+    elemQ.innerHTML = qu;
     elemS.innerHTML = "-" + quote[0].speaker;
   }
 </script>
