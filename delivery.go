@@ -20,13 +20,24 @@ func DeliverInspiration(slackWebhook, generateEndpoint, slackChannel string) {
 	now, next := getURLS(generateEndpoint)
 
 	// Make sure current image is in cache
-	http.Get(now)
-	fmt.Println(time.Now().UTC(), "pre-loaded current inspiration")
+	for {
+		r, err := http.Get(now)
+		if err != nil {
+			continue
+		}
+		if r != nil {
+			if r.StatusCode == http.StatusOK || r.StatusCode == http.StatusNotModified {
+				break
+			}
+		}
+	}
+
+	fmt.Println(time.Now().UTC(), "Loaded current inspiration")
 
 	// Preload the 'next' image so that it is cached in URL grab or refreshes
 	// old cache using the same entropy;
 	http.Get(next)
-	fmt.Println(time.Now().UTC(), "pre-loaded next inspiration")
+	fmt.Println(time.Now().UTC(), "Pre-loaded next inspiration")
 
 	// Post the 'now' image to channel
 	payload := slack.Payload{
@@ -40,7 +51,8 @@ func DeliverInspiration(slackWebhook, generateEndpoint, slackChannel string) {
 		},
 	}
 	slack.Send(slackWebhook, "", payload)
-	fmt.Println(time.Now().UTC(), "posted team inspiration")
+
+	fmt.Println(time.Now().UTC(), "Posted team inspiration")
 }
 
 // Deterministically retrieve current and next image url using entropy provided
@@ -62,8 +74,15 @@ func getURLS(generateEndpoint string) (current, next string) {
 		// (image was generated for the same day as the prior image)
 		next = current + entToday + nextSuff
 	} else {
-		// Next url with tomorrow's rotation code
-		next = next + entTomorrow
+		// If today is a friday, preload monday's image
+		if now.Weekday() == time.Friday {
+			nextWeek := now.AddDate(0, 0, 3)
+			entNextWeek := fmt.Sprintf("%d%d%d", nextWeek.Year(), nextWeek.Month(), nextWeek.Day())
+			next = next + entNextWeek
+		} else {
+			// Next url with tomorrow's rotation code
+			next = next + entTomorrow
+		}
 	}
 
 	return
